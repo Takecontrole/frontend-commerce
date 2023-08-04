@@ -5,7 +5,7 @@ import {
   AiOutlineDelete,
 } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { backend_url, server } from "../../server";
+import { server } from "../../server";
 import styles from "../../styles/styles";
 import { DataGrid } from "@material-ui/data-grid";
 import { Button } from "@material-ui/core";
@@ -50,27 +50,30 @@ const ProfileContent = ({ active }) => {
   };
 
   const handleImage = async (e) => {
-    const file = e.target.files[0];
-    setAvatar(file);
+    const reader = new FileReader();
 
-    const formData = new FormData();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setAvatar(reader.result);
+        axios
+          .put(
+            `${server}/user/update-avatar`,
+            { avatar: reader.result },
+            {
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            dispatch(loadUser());
+            toast.success("avatar updated successfully!");
+          })
+          .catch((error) => {
+            toast.error(error);
+          });
+      }
+    };
 
-    formData.append("image", e.target.files[0]);
-
-    await axios
-      .put(`${server}/user/update-avatar`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-         dispatch(loadUser());
-         toast.success("аватар обновлён успешно!");
-      })
-      .catch((error) => {
-        toast.error(error);
-      });
+    reader.readAsDataURL(e.target.files[0]);
   };
 
   return (
@@ -81,8 +84,8 @@ const ProfileContent = ({ active }) => {
           <div className="flex justify-center w-full">
             <div className="relative">
               <img
-                src={`${backend_url}${user?.avatar}`}
-                className="w-[150px] h-[150px] rounded-full object-cover border-[3px] border-[#5B2935]"
+                src={`${user?.avatar?.url}`}
+                className="w-[150px] h-[150px] rounded-full object-cover border-[3px] border-[#3ad132]"
                 alt=""
               />
               <div className="w-[30px] h-[30px] bg-[#E3E9EE] rounded-full flex items-center justify-center cursor-pointer absolute bottom-[5px] right-[5px]">
@@ -104,7 +107,7 @@ const ProfileContent = ({ active }) => {
             <form onSubmit={handleSubmit} aria-required={true}>
               <div className="w-full 800px:flex block pb-3">
                 <div className=" w-[100%] 800px:w-[50%]">
-                  <label className="block pb-2">Имя</label>
+                  <label className="block pb-2">Full Name</label>
                   <input
                     type="text"
                     className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
@@ -114,7 +117,7 @@ const ProfileContent = ({ active }) => {
                   />
                 </div>
                 <div className=" w-[100%] 800px:w-[50%]">
-                  <label className="block pb-2">Email</label>
+                  <label className="block pb-2">Email Address</label>
                   <input
                     type="text"
                     className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
@@ -127,7 +130,7 @@ const ProfileContent = ({ active }) => {
 
               <div className="w-full 800px:flex block pb-3">
                 <div className=" w-[100%] 800px:w-[50%]">
-                  <label className="block pb-2">Номер телефона</label>
+                  <label className="block pb-2">Phone Number</label>
                   <input
                     type="number"
                     className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
@@ -138,7 +141,7 @@ const ProfileContent = ({ active }) => {
                 </div>
 
                 <div className=" w-[100%] 800px:w-[50%]">
-                  <label className="block pb-2">Введите пароль</label>
+                  <label className="block pb-2">Enter your password</label>
                   <input
                     type="password"
                     className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
@@ -149,9 +152,9 @@ const ProfileContent = ({ active }) => {
                 </div>
               </div>
               <input
-                className={`w-[250px] h-[40px] border border-[#D58E88] text-center text-[#D58E88] rounded-[3px] mt-8 cursor-pointer`}
+                className={`w-[250px] h-[40px] border border-[#3a24db] text-center text-[#3a24db] rounded-[3px] mt-8 cursor-pointer`}
                 required
-                value="Обновить"
+                value="Update"
                 type="submit"
               />
             </form>
@@ -207,11 +210,11 @@ const AllOrders = () => {
   }, []);
 
   const columns = [
-    { field: "id", headerName: "Заказ ID", minWidth: 150, flex: 0.7 },
+    { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
     {
       field: "status",
-      headerName: "Статус",
+      headerName: "Status",
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
@@ -222,7 +225,7 @@ const AllOrders = () => {
     },
     {
       field: "itemsQty",
-      headerName: "Кол-во",
+      headerName: "Items Qty",
       type: "number",
       minWidth: 130,
       flex: 0.7,
@@ -230,7 +233,7 @@ const AllOrders = () => {
 
     {
       field: "total",
-      headerName: "Итог",
+      headerName: "Total",
       type: "number",
       minWidth: 130,
       flex: 0.8,
@@ -264,8 +267,8 @@ const AllOrders = () => {
       row.push({
         id: item._id,
         itemsQty: item.cart.length,
-        total: "RUB₽ " + item.totalPrice,
-        status: item.status === "Delivered" && "доставлен" || item.status === "Processing" && "в процессе" || item.status === "Transferred to delivery partner" && "Отдан в слуюбу доставки" || item.status === "Refund Success" && "Успешный возврат" || item.status === "Processing refund" && "Оформление возврата" || item.status === "Shipping" && "В службе доставки" || item.status === "Received" && "Получен" || item.status === "On the way" && "В пути"
+        total: "US$ " + item.totalPrice,
+        status: item.status,
       });
     });
 
@@ -291,14 +294,15 @@ const AllRefundOrders = () => {
     dispatch(getAllOrdersOfUser(user._id));
   }, []);
 
-  const eligibleOrders = orders && orders.filter((item) => item.status === "Processing refund");
+  const eligibleOrders =
+    orders && orders.filter((item) => item.status === "Processing refund");
 
   const columns = [
-    { field: "id", headerName: "Заказ ID", minWidth: 150, flex: 0.7 },
+    { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
     {
       field: "status",
-      headerName: "Статус",
+      headerName: "Status",
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
@@ -309,7 +313,7 @@ const AllRefundOrders = () => {
     },
     {
       field: "itemsQty",
-      headerName: "Кол-во",
+      headerName: "Items Qty",
       type: "number",
       minWidth: 130,
       flex: 0.7,
@@ -317,7 +321,7 @@ const AllRefundOrders = () => {
 
     {
       field: "total",
-      headerName: "Итог",
+      headerName: "Total",
       type: "number",
       minWidth: 130,
       flex: 0.8,
@@ -347,12 +351,12 @@ const AllRefundOrders = () => {
   const row = [];
 
   eligibleOrders &&
-   eligibleOrders.forEach((item) => {
+    eligibleOrders.forEach((item) => {
       row.push({
         id: item._id,
         itemsQty: item.cart.length,
-        total: "RUB₽ " + item.totalPrice,
-        status: item.status === "Delivered" && "доставлен" || item.status === "Processing" && "в процессе" || item.status === "Transferred to delivery partner" && "Отдан в слуюбу доставки" || item.status === "Refund Success" && "Успешный возврат" || item.status === "Processing refund" && "Оформление возврата" || item.status === "Shipping" && "В службе доставки" || item.status === "Received" && "Получен" || item.status === "On the way" && "В пути"
+        total: "US$ " + item.totalPrice,
+        status: item.status,
       });
     });
 
@@ -379,11 +383,11 @@ const TrackOrder = () => {
   }, []);
 
   const columns = [
-    { field: "id", headerName: "Заказ ID", minWidth: 150, flex: 0.7 },
+    { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
     {
       field: "status",
-      headerName: "Статус",
+      headerName: "Status",
       minWidth: 130,
       flex: 0.7,
       cellClassName: (params) => {
@@ -394,7 +398,7 @@ const TrackOrder = () => {
     },
     {
       field: "itemsQty",
-      headerName: "Кол-во",
+      headerName: "Items Qty",
       type: "number",
       minWidth: 130,
       flex: 0.7,
@@ -402,7 +406,7 @@ const TrackOrder = () => {
 
     {
       field: "total",
-      headerName: "Итог",
+      headerName: "Total",
       type: "number",
       minWidth: 130,
       flex: 0.8,
@@ -436,8 +440,8 @@ const TrackOrder = () => {
       row.push({
         id: item._id,
         itemsQty: item.cart.length,
-        total: "RUB₽ " + item.totalPrice,
-        status: item.status === "Delivered" && "доставлен" || item.status === "Processing" && "в процессе" || item.status === "Transferred to delivery partner" && "Отдан в слуюбу доставки" || item.status === "Refund Success" && "Успешный возврат" || item.status === "Processing refund" && "Оформление возврата" || item.status === "Shipping" && "В службе доставки" || item.status === "Received" && "Получен" || item.status === "On the way" && "В пути"
+        total: "US$ " + item.totalPrice,
+        status: item.status,
       });
     });
 
@@ -481,7 +485,7 @@ const ChangePassword = () => {
   return (
     <div className="w-full px-5">
       <h1 className="block text-[25px] text-center font-[600] text-[#000000ba] pb-2">
-        Сменить пароль
+        Change Password
       </h1>
       <div className="w-full">
         <form
@@ -490,7 +494,7 @@ const ChangePassword = () => {
           className="flex flex-col items-center"
         >
           <div className=" w-[100%] 800px:w-[50%] mt-5">
-            <label className="block pb-2">Введите старый пароль</label>
+            <label className="block pb-2">Enter your old password</label>
             <input
               type="password"
               className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
@@ -500,7 +504,7 @@ const ChangePassword = () => {
             />
           </div>
           <div className=" w-[100%] 800px:w-[50%] mt-2">
-            <label className="block pb-2">Новый пароль</label>
+            <label className="block pb-2">Enter your new password</label>
             <input
               type="password"
               className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
@@ -510,7 +514,7 @@ const ChangePassword = () => {
             />
           </div>
           <div className=" w-[100%] 800px:w-[50%] mt-2">
-            <label className="block pb-2">Подтвердите</label>
+            <label className="block pb-2">Enter your confirm password</label>
             <input
               type="password"
               className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
@@ -519,9 +523,9 @@ const ChangePassword = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <input
-              className={`w-[95%] h-[40px] border border-[#5B2935] text-center text-[#5B2935] rounded-[3px] mt-8 cursor-pointer`}
+              className={`w-[95%] h-[40px] border border-[#3a24db] text-center text-[#3a24db] rounded-[3px] mt-8 cursor-pointer`}
               required
-              value="Обновить"
+              value="Update"
               type="submit"
             />
           </div>
@@ -544,13 +548,13 @@ const Address = () => {
 
   const addressTypeData = [
     {
-      name: "Другой",
+      name: "Default",
     },
     {
-      name: "Дом",
+      name: "Home",
     },
     {
-      name: "Офис",
+      name: "Office",
     },
   ];
 
@@ -558,7 +562,7 @@ const Address = () => {
     e.preventDefault();
 
     if (addressType === "" || country === "" || city === "") {
-      toast.error("Заполните все поля!");
+      toast.error("Please fill all the fields!");
     } else {
       dispatch(
         updatUserAddress(
@@ -598,13 +602,13 @@ const Address = () => {
               />
             </div>
             <h1 className="text-center text-[25px] font-Poppins">
-              Добавить новый адрес
+              Add New Address
             </h1>
             <div className="w-full">
               <form aria-required onSubmit={handleSubmit} className="w-full">
                 <div className="w-full block p-4">
                   <div className="w-full pb-2">
-                    <label className="block pb-2">Страна</label>
+                    <label className="block pb-2">Country</label>
                     <select
                       name=""
                       id=""
@@ -613,7 +617,7 @@ const Address = () => {
                       className="w-[95%] border h-[40px] rounded-[5px]"
                     >
                       <option value="" className="block border pb-2">
-                        Выберите страну
+                        choose your country
                       </option>
                       {Country &&
                         Country.getAllCountries().map((item) => (
@@ -629,7 +633,7 @@ const Address = () => {
                   </div>
 
                   <div className="w-full pb-2">
-                    <label className="block pb-2">Выберите город.</label>
+                    <label className="block pb-2">Choose your City</label>
                     <select
                       name=""
                       id=""
@@ -638,7 +642,7 @@ const Address = () => {
                       className="w-[95%] border h-[40px] rounded-[5px]"
                     >
                       <option value="" className="block border pb-2">
-                        Выберите город.
+                        choose your city
                       </option>
                       {State &&
                         State.getStatesOfCountry(country).map((item) => (
@@ -654,7 +658,7 @@ const Address = () => {
                   </div>
 
                   <div className="w-full pb-2">
-                    <label className="block pb-2">Улица</label>
+                    <label className="block pb-2">Address 1</label>
                     <input
                       type="address"
                       className={`${styles.input}`}
@@ -664,7 +668,7 @@ const Address = () => {
                     />
                   </div>
                   <div className="w-full pb-2">
-                    <label className="block pb-2">Дом/Квартира</label>
+                    <label className="block pb-2">Address 2</label>
                     <input
                       type="address"
                       className={`${styles.input}`}
@@ -675,7 +679,7 @@ const Address = () => {
                   </div>
 
                   <div className="w-full pb-2">
-                    <label className="block pb-2">Индекс</label>
+                    <label className="block pb-2">Zip Code</label>
                     <input
                       type="number"
                       className={`${styles.input}`}
@@ -686,7 +690,7 @@ const Address = () => {
                   </div>
 
                   <div className="w-full pb-2">
-                    <label className="block pb-2">Тип адреса</label>
+                    <label className="block pb-2">Address Type</label>
                     <select
                       name=""
                       id=""
@@ -695,7 +699,7 @@ const Address = () => {
                       className="w-[95%] border h-[40px] rounded-[5px]"
                     >
                       <option value="" className="block border pb-2">
-                        Выберите тип адреса
+                        Choose your Address Type
                       </option>
                       {addressTypeData &&
                         addressTypeData.map((item) => (
@@ -726,13 +730,13 @@ const Address = () => {
       )}
       <div className="flex w-full items-center justify-between">
         <h1 className="text-[25px] font-[600] text-[#000000ba] pb-2">
-          Мои адреса
+          My Addresses
         </h1>
         <div
           className={`${styles.button} !rounded-md`}
           onClick={() => setOpen(true)}
         >
-          <span className="text-[#fff]">Добавить</span>
+          <span className="text-[#fff]">Add New</span>
         </div>
       </div>
       <br />
@@ -767,7 +771,7 @@ const Address = () => {
 
       {user && user.addresses.length === 0 && (
         <h5 className="text-center pt-8 text-[18px]">
-          У вас нет сохраненных адресов!
+          You not have any saved address!
         </h5>
       )}
     </div>

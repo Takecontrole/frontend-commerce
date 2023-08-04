@@ -9,57 +9,67 @@ import { toast } from "react-toastify";
 
 const ShopSettings = () => {
   const { seller } = useSelector((state) => state.seller);
-  const [avatar,setAvatar] = useState();
-  const [name,setName] = useState(seller && seller.name);
-  const [description,setDescription] = useState(seller && seller.description ? seller.description : "");
-  const [address,setAddress] = useState(seller && seller.address);
-  const [phoneNumber,setPhoneNumber] = useState(seller && seller.phoneNumber);
-  const [zipCode,setZipcode] = useState(seller && seller.zipCode);
-
+  const [avatar, setAvatar] = useState();
+  const [name, setName] = useState(seller && seller.name);
+  const [description, setDescription] = useState(
+    seller && seller.description ? seller.description : ""
+  );
+  const [address, setAddress] = useState(seller && seller.address);
+  const [phoneNumber, setPhoneNumber] = useState(seller && seller.phoneNumber);
+  const [zipCode, setZipcode] = useState(seller && seller.zipCode);
 
   const dispatch = useDispatch();
 
   const handleImage = async (e) => {
-    e.preventDefault();
-    const file = e.target.files[0];
-    setAvatar(file);
+    const reader = new FileReader();
 
-    const formData = new FormData();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setAvatar(reader.result);
+        axios
+          .put(
+            `${server}/shop/update-shop-avatar`,
+            { avatar: reader.result },
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res) => {
+            dispatch(loadSeller());
+            toast.success("Avatar updated successfully!");
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message);
+          });
+      }
+    };
 
-    formData.append("image", e.target.files[0]);
-    
-    await axios.put(`${server}/shop/update-shop-avatar`, formData,{
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-    }).then((res) => {
-        dispatch(loadSeller());
-        toast.success("Аватар обновлен успешно!")
-    }).catch((error) => {
-        toast.error(error.response.data.message);
-    })
-
+    reader.readAsDataURL(e.target.files[0]);
   };
 
   const updateHandler = async (e) => {
     e.preventDefault();
-    
-    await axios.put(`${server}/shop/update-seller-info`, {
-        name,
-        address,
-        zipCode,
-        phoneNumber,
-        description,
-    }, {withCredentials: true}).then((res) => {
-        toast.success("Успешно!");
+
+    await axios
+      .put(
+        `${server}/shop/update-seller-info`,
+        {
+          name,
+          address,
+          zipCode,
+          phoneNumber,
+          description,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        toast.success("Shop info updated succesfully!");
         dispatch(loadSeller());
-    }).catch((error)=> {
+      })
+      .catch((error) => {
         toast.error(error.response.data.message);
-    })
+      });
   };
-
-
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center">
@@ -67,9 +77,7 @@ const ShopSettings = () => {
         <div className="w-full flex items-center justify-center">
           <div className="relative">
             <img
-              src={
-                avatar ? URL.createObjectURL(avatar) : `${backend_url}/${seller.avatar}`
-              }
+              src={avatar ? avatar : `${seller.avatar?.url}`}
               alt=""
               className="w-[200px] h-[200px] rounded-full cursor-pointer"
             />
@@ -95,7 +103,7 @@ const ShopSettings = () => {
         >
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Название магазина</label>
+              <label className="block pb-2">Shop Name</label>
             </div>
             <input
               type="name"
@@ -108,14 +116,14 @@ const ShopSettings = () => {
           </div>
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Описание магазина</label>
+              <label className="block pb-2">Shop description</label>
             </div>
             <input
               type="name"
               placeholder={`${
                 seller?.description
                   ? seller.description
-                  : "Добавьте описание"
+                  : "Enter your shop description"
               }`}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -124,7 +132,7 @@ const ShopSettings = () => {
           </div>
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Адрес магазина</label>
+              <label className="block pb-2">Shop Address</label>
             </div>
             <input
               type="name"
@@ -138,7 +146,7 @@ const ShopSettings = () => {
 
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Номер телефона</label>
+              <label className="block pb-2">Shop Phone Number</label>
             </div>
             <input
               type="number"
@@ -152,7 +160,7 @@ const ShopSettings = () => {
 
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Почтовый индекс</label>
+              <label className="block pb-2">Shop Zip Code</label>
             </div>
             <input
               type="number"
@@ -167,7 +175,7 @@ const ShopSettings = () => {
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <input
               type="submit"
-              value="Обновить инфо"
+              value="Update Shop"
               className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
               required
               readOnly

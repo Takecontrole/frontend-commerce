@@ -26,20 +26,28 @@ const CreateProduct = () => {
       toast.error(error);
     }
     if (success) {
-      toast.success("Товар создан успешно!");
+      toast.success("Товар успешно создан");
       navigate("/dashboard");
       window.location.reload();
     }
   }, [dispatch, error, success]);
 
   const handleImageChange = (e) => {
-    e.preventDefault();
+    const files = Array.from(e.target.files);
 
-    let files = Array.from(e.target.files);
-    setImages((prevImages) => [...prevImages, ...files]);
+    setImages([]);
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImages((old) => [...old, reader.result]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
-
-  console.log(images);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -47,7 +55,7 @@ const CreateProduct = () => {
     const newForm = new FormData();
 
     images.forEach((image) => {
-      newForm.append("images", image);
+      newForm.set("images", image);
     });
     newForm.append("name", name);
     newForm.append("description", description);
@@ -57,18 +65,30 @@ const CreateProduct = () => {
     newForm.append("discountPrice", discountPrice);
     newForm.append("stock", stock);
     newForm.append("shopId", seller._id);
-    dispatch(createProduct(newForm));
+    dispatch(
+      createProduct({
+        name,
+        description,
+        category,
+        tags,
+        originalPrice,
+        discountPrice,
+        stock,
+        shopId: seller._id,
+        images,
+      })
+    );
   };
 
   return (
     <div className="w-[90%] 800px:w-[50%] bg-white  shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">
-      <h5 className="text-[30px] font-Poppins text-center">Создать товар</h5>
+      <h5 className="text-[30px] font-Poppins text-center">Create Product</h5>
       {/* create product form */}
       <form onSubmit={handleSubmit}>
         <br />
         <div>
           <label className="pb-2">
-            Имя <span className="text-red-500">*</span>
+            Название <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -76,7 +96,7 @@ const CreateProduct = () => {
             value={name}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             onChange={(e) => setName(e.target.value)}
-            placeholder="..."
+            placeholder="Введите название товара..."
           />
         </div>
         <br />
@@ -93,7 +113,7 @@ const CreateProduct = () => {
             value={description}
             className="mt-2 appearance-none block w-full pt-2 px-3 border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="..."
+            placeholder="Введите описание товара..."
           ></textarea>
         </div>
         <br />
@@ -106,7 +126,7 @@ const CreateProduct = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            <option value="Категория">Категория</option>
+            <option value="Choose a category">Выберите категорию</option>
             {categoriesData &&
               categoriesData.map((i) => (
                 <option value={i.title} key={i.title}>
@@ -117,32 +137,32 @@ const CreateProduct = () => {
         </div>
         <br />
         <div>
-          <label className="pb-2">Тэги</label>
+          <label className="pb-2">Тюги</label>
           <input
             type="text"
             name="tags"
             value={tags}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             onChange={(e) => setTags(e.target.value)}
-            placeholder="..."
+            placeholder="Введите тэги..."
           />
         </div>
         <br />
         <div>
-          <label className="pb-2">Цена до</label>
+          <label className="pb-2">Оригинальная цена</label>
           <input
             type="number"
             name="price"
             value={originalPrice}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             onChange={(e) => setOriginalPrice(e.target.value)}
-            placeholder="..."
+            placeholder="Введите оригинальную цену..."
           />
         </div>
         <br />
         <div>
           <label className="pb-2">
-            Цена (со скидкой) <span className="text-red-500">*</span>
+            Цена со скидкой <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -150,13 +170,13 @@ const CreateProduct = () => {
             value={discountPrice}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             onChange={(e) => setDiscountPrice(e.target.value)}
-            placeholder="..."
+            placeholder="Введите цену со скидкой..."
           />
         </div>
         <br />
         <div>
           <label className="pb-2">
-           Наличие <span className="text-red-500">*</span>
+            В наличии <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -164,7 +184,7 @@ const CreateProduct = () => {
             value={stock}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             onChange={(e) => setStock(e.target.value)}
-            placeholder="..."
+            placeholder="Сколько в наличии?..."
           />
         </div>
         <br />
@@ -187,7 +207,7 @@ const CreateProduct = () => {
             {images &&
               images.map((i) => (
                 <img
-                  src={URL.createObjectURL(i)}
+                  src={i}
                   key={i}
                   alt=""
                   className="h-[120px] w-[120px] object-cover m-2"
@@ -198,7 +218,7 @@ const CreateProduct = () => {
           <div>
             <input
               type="submit"
-              value="Создать"
+              value="Create"
               className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
