@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import { backend_url } from "../../../server";
-import logo from "./chrome_image_25 июл. 2023 г. 13_29_22 GMT+03_00.png";
+import logo from "../../pick.png";
 const DashboardHeader = () => {
   const { seller } = useSelector((state) => state.seller);
   return (

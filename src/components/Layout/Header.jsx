@@ -17,7 +17,7 @@ import { backend_url } from "../../server";
 import Cart from "../cart/Cart";
 import Wishlist from "../Wishlist/Wishlist";
 import { RxCross1 } from "react-icons/rx";
-import logo from "./chrome_image_25 июл. 2023 г. 13_29_22 GMT+03_00.png";
+import logo from "../pick.png";
 
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
