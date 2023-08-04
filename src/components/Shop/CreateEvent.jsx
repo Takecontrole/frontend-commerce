@@ -20,45 +20,60 @@ const CreateEvent = () => {
   const [originalPrice, setOriginalPrice] = useState();
   const [discountPrice, setDiscountPrice] = useState();
   const [stock, setStock] = useState();
- const [startDate,setStartDate] = useState(null);
- const [endDate,setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
- const handleStartDateChange = (e) => {
+  const handleStartDateChange = (e) => {
     const startDate = new Date(e.target.value);
     const minEndDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000);
     setStartDate(startDate);
     setEndDate(null);
-    document.getElementById("end-date").min = minEndDate.toISOString.slice(0,10);
- }
+    document.getElementById("end-date").min = minEndDate.toISOString.slice(
+      0,
+      10
+    );
+  };
 
- const handleEndDateChange = (e) => {
+  const handleEndDateChange = (e) => {
     const endDate = new Date(e.target.value);
-     setEndDate(endDate);
- };
-   
- const today = new Date().toISOString().slice(0,10);
+    setEndDate(endDate);
+  };
 
- const minEndDate = startDate ? new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0,10) : "";
+  const today = new Date().toISOString().slice(0, 10);
+
+  const minEndDate = startDate
+    ? new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10)
+    : "";
 
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
     if (success) {
-      toast.success("Событие успешно создано!");
+      toast.success("Событие создано!");
       navigate("/dashboard-events");
       window.location.reload();
     }
   }, [dispatch, error, success]);
 
   const handleImageChange = (e) => {
-    e.preventDefault();
+    const files = Array.from(e.target.files);
 
-    let files = Array.from(e.target.files);
-    setImages((prevImages) => [...prevImages, ...files]);
+    setImages([]);
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setImages((old) => [...old, reader.result]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
-
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -68,17 +83,20 @@ const CreateEvent = () => {
     images.forEach((image) => {
       newForm.append("images", image);
     });
-    newForm.append("name", name);
-    newForm.append("description", description);
-    newForm.append("category", category);
-    newForm.append("tags", tags);
-    newForm.append("originalPrice", originalPrice);
-    newForm.append("discountPrice", discountPrice);
-    newForm.append("stock", stock);
-    newForm.append("shopId", seller._id);
-    newForm.append("start_Date", startDate.toISOString());
-    newForm.append("Finish_Date", endDate.toISOString());
-    dispatch(createevent(newForm));
+    const data = {
+      name,
+      description,
+      category,
+      tags,
+      originalPrice,
+      discountPrice,
+      stock,
+      images,
+      shopId: seller._id,
+      start_Date: startDate?.toISOString(),
+      Finish_Date: endDate?.toISOString(),
+    };
+    dispatch(createevent(data));
   };
 
   return (

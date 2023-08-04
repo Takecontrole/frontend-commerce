@@ -143,7 +143,7 @@ const ProfileSidebar = ({ setActive, active }) => {
                 active === 8 ? "text-[#D58E88]" : ""
               } 800px:block hidden`}
             >
-              Панель управления
+             Админ Панель 
             </span>
           </div>
         </Link>

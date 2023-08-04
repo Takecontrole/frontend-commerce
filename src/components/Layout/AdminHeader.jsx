@@ -6,7 +6,7 @@ import { MdOutlineLocalOffer } from 'react-icons/md'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { backend_url } from '../../server'
-
+import logo from "./chrome_image_25 июл. 2023 г. 13_29_22 GMT+03_00.png";
 const AdminHeader = () => {
     const {user} = useSelector((state) => state.user);
 
@@ -15,7 +15,7 @@ const AdminHeader = () => {
       <div>
         <Link to="/">
           <img
-            src="./chrome_image_25 июл. 2023 г. 13_29_22 GMT+03_00.png"
+            src={logo}
             style={{width:"128px",height:"85px"}}
             alt=""
           />
