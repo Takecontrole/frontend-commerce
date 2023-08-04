@@ -66,7 +66,7 @@ const Header = ({ activeHeading }) => {
           <div>
             <Link to="/">
               <img
-                src="../../chrome_image_25 июл. 2023 г. 13_29_22 GMT+03_00.png"
+                src="./chrome_image_25 июл. 2023 г. 13_29_22 GMT+03_00.png"
                 alt=""
                 style={{width:"128px",height:"85px"}}
                 className="mt-3 cursor-pointer"
