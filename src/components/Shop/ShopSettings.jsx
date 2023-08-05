@@ -36,7 +36,7 @@ const ShopSettings = () => {
           )
           .then((res) => {
             dispatch(loadSeller());
-            toast.success("Avatar updated successfully!");
+            toast.success("Ава успешно обновлена!");
           })
           .catch((error) => {
             toast.error(error.response.data.message);
@@ -63,7 +63,7 @@ const ShopSettings = () => {
         { withCredentials: true }
       )
       .then((res) => {
-        toast.success("Shop info updated succesfully!");
+        toast.success("Инфа обновлена!");
         dispatch(loadSeller());
       })
       .catch((error) => {
@@ -103,7 +103,7 @@ const ShopSettings = () => {
         >
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Shop Name</label>
+              <label className="block pb-2">Название магазина</label>
             </div>
             <input
               type="name"
@@ -116,14 +116,14 @@ const ShopSettings = () => {
           </div>
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Shop description</label>
+              <label className="block pb-2">Описание магазина</label>
             </div>
             <input
               type="name"
               placeholder={`${
                 seller?.description
                   ? seller.description
-                  : "Enter your shop description"
+                  : "Введите описание"
               }`}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -132,7 +132,7 @@ const ShopSettings = () => {
           </div>
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Shop Address</label>
+              <label className="block pb-2">Адрес магазина</label>
             </div>
             <input
               type="name"
@@ -146,7 +146,7 @@ const ShopSettings = () => {
 
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Shop Phone Number</label>
+              <label className="block pb-2">Телефон магазина</label>
             </div>
             <input
               type="number"
@@ -160,7 +160,7 @@ const ShopSettings = () => {
 
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <div className="w-full pl-[3%]">
-              <label className="block pb-2">Shop Zip Code</label>
+              <label className="block pb-2">Почтовый индекс</label>
             </div>
             <input
               type="number"
@@ -175,7 +175,7 @@ const ShopSettings = () => {
           <div className="w-[100%] flex items-center flex-col 800px:w-[50%] mt-5">
             <input
               type="submit"
-              value="Update Shop"
+              value="Обновить инфу"
               className={`${styles.input} !w-[95%] mb-4 800px:mb-0`}
               required
               readOnly

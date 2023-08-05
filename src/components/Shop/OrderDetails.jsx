@@ -136,7 +136,7 @@ const OrderDetails = () => {
       </div>
       <br />
       <br />
-      <h4 className="pt-3 text-[20px] font-[600]">Order Status:</h4>
+      <h4 className="pt-3 text-[20px] font-[600]">Статус заказа:</h4>
       {data?.status !== "Processing refund" && data?.status !== "Refund Success" && (
         <select
           value={status}

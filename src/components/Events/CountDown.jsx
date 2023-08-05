@@ -11,10 +11,10 @@ const CountDown = ({ data }) => {
     }, 1000);
 
     if (
-      typeof timeLeft.days === 'undefined' &&
-      typeof timeLeft.hours === 'undefined' &&
-      typeof timeLeft.minutes === 'undefined' &&
-      typeof timeLeft.seconds === 'undefined'
+      typeof timeLeft.дней === 'undefined' &&
+      typeof timeLeft.часов === 'undefined' &&
+      typeof timeLeft.минут === 'undefined' &&
+      typeof timeLeft.секунд === 'undefined'
     ) {
       axios.delete(`${server}/event/delete-shop-event/${data._id}`);
     }
@@ -27,17 +27,17 @@ const CountDown = ({ data }) => {
 
     if (difference > 0) {
       timeLeft = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
+        дней: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        часов: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        минут: Math.floor((difference / 1000 / 60) % 60),
+        секунд: Math.floor((difference / 1000) % 60),
       };
     }
 
     return timeLeft;
   }
 
-  const timerComponents = Object.keys(timeLeft).map((interval) => {
+  const timerComponents = Object.keys(timeLeft).map((interval) => { 
     if (!timeLeft[interval]) {
       return null;
     }

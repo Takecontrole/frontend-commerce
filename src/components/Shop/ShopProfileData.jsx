@@ -33,7 +33,7 @@ const ShopProfileData = ({ isOwner }) => {
                 active === 1 ? "text-red-500" : "text-[#333]"
               } cursor-pointer pr-[20px]`}
             >
-              Shop Products
+              Товары продавца
             </h5>
           </div>
           <div className="flex items-center" onClick={() => setActive(2)}>
@@ -42,7 +42,7 @@ const ShopProfileData = ({ isOwner }) => {
                 active === 2 ? "text-red-500" : "text-[#333]"
               } cursor-pointer pr-[20px]`}
             >
-              Running Events
+              Текущие события
             </h5>
           </div>
 
@@ -52,7 +52,7 @@ const ShopProfileData = ({ isOwner }) => {
                 active === 3 ? "text-red-500" : "text-[#333]"
               } cursor-pointer pr-[20px]`}
             >
-              Shop Reviews
+              Отзывы магазина
             </h5>
           </div>
         </div>
@@ -61,7 +61,7 @@ const ShopProfileData = ({ isOwner }) => {
             <div>
               <Link to="/dashboard">
                 <div className={`${styles.button} !rounded-[4px] h-[42px]`}>
-                  <span className="text-[#fff]">Go Dashboard</span>
+                  <span className="text-[#fff]">Панель управления</span>
                 </div>
               </Link>
             </div>

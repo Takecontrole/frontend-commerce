@@ -21,6 +21,7 @@ const HomePage = () => {
         <div className="w-9/12">
         <BestDeals /> 
         <Events />
+        <FeaturedProduct />
         </div>
         <div className="w-3/12 m-4">
                   <img
@@ -40,7 +41,6 @@ const HomePage = () => {
           />
         </div>
         </div>
-        <FeaturedProduct />
         <Sponsored />
         <Footer />
     </div>

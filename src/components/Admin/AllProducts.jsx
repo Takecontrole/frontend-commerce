@@ -53,7 +53,7 @@ const AllProducts = () => {
       field: "Preview",
       flex: 0.8,
       minWidth: 100,
-      headerName: "",
+      headerName: "Просмотр",
       type: "number",
       sortable: false,
       renderCell: (params) => {

@@ -121,7 +121,7 @@ const Header = ({ activeHeading }) => {
           <div className={`${styles.button} `}>
             <Link to={`${isSeller ? "/dashboard" : "/shop-create"} `}>
               <h1 className="text-[#fff] flex items-center text-center ">
-                {isSeller ? "Панель управления" : "Стать продавцом"}{" "}
+                {isSeller ? "Панель продавца" : "Стать продавцом"}{" "}
                 <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
@@ -231,7 +231,7 @@ const Header = ({ activeHeading }) => {
           <div>
             <Link to="/">
               <img
-                src="../../chrome_image_25 июл. 2023 г. 13_29_22 GMT+03_00.png"
+                src={logo}
                 alt=""
                 style={{width:"64px",height:"42px"}}
                 className="mt-3 cursor-pointer"
@@ -316,7 +316,7 @@ const Header = ({ activeHeading }) => {
               <div className={`${styles.button} ml-4 !rounded-[4px]`}>
                 <Link to="/shop-create">
                   <h1 className="text-[#fff] flex items-center text-center">
-                    {isSeller ? "Панель управления" : "Стать продавцом"}{" "} <IoIosArrowForward className="ml-1" />
+                    {isSeller ? "Панель продавца" : "Стать продавцом"}{" "} <IoIosArrowForward className="ml-1" />
                   </h1>
                 </Link>
               </div>
@@ -341,13 +341,13 @@ const Header = ({ activeHeading }) => {
                       to="/login"
                       className="text-[18px] pr-[10px] text-[#000000b7]"
                     >
-                      Login /
+                      Войти /
                     </Link>
                     <Link
                       to="/sign-up"
                       className="text-[18px] text-[#000000b7]"
                     >
-                      Sign up
+                      Зарегаться
                     </Link>
                   </>
                 )}
